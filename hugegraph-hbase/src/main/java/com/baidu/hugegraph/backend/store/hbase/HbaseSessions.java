@@ -105,12 +105,12 @@ public class HbaseSessions extends BackendSessionPool {
     }
 
     @Override
-    protected boolean opened() {
+    protected synchronized boolean opened() {
         return this.hbase != null && !this.hbase.isClosed();
     }
 
     @Override
-    public final synchronized Session session() {
+    public final Session session() {
         return (Session) super.getOrNewSession();
     }
 
@@ -120,7 +120,7 @@ public class HbaseSessions extends BackendSessionPool {
     }
 
     @Override
-    protected void doClose() {
+    protected synchronized void doClose() {
         if (this.hbase == null || this.hbase.isClosed()) {
             return;
         }
@@ -260,14 +260,6 @@ public class HbaseSessions extends BackendSessionPool {
         }
 
         /**
-         * Clear updates not committed in the session
-         */
-        @Override
-        public void clear() {
-            this.batch.clear();
-        }
-
-        /**
          * Any change in the session
          */
         @Override
@@ -304,6 +296,14 @@ public class HbaseSessions extends BackendSessionPool {
             this.batch.clear();
 
             return count;
+        }
+
+        /**
+         * Rollback all updates(put/delete) not committed
+         */
+        @Override
+        public void rollback() {
+            this.batch.clear();
         }
 
         /**
