@@ -176,28 +176,44 @@ public class GremlinAPI extends API {
         @JsonProperty
         private Map<String, String> aliases = new HashMap<>();
 
-        public void aliase(String key, String value) {
-            this.aliases.put(key, value);
+        public String gremlin() {
+            return this.gremlin;
         }
 
-        public void binding(String name, Object value) {
-            this.bindings.put(name, value);
+        public void gremlin(String gremlin) {
+            this.gremlin = gremlin;
         }
 
         public Map<String, Object> bindings() {
             return this.bindings;
         }
 
+        public void bindings(Map<String, Object> bindings) {
+            this.bindings = bindings;
+        }
+
+        public void binding(String name, Object value) {
+            this.bindings.put(name, value);
+        }
+
         public String language() {
             return this.language;
         }
 
-        public String gremlin() {
-            return this.gremlin;
+        public void language(String language) {
+            this.language = language;
         }
 
         public Map<String, String> aliases() {
             return this.aliases;
+        }
+
+        public void aliases(Map<String, String> aliases) {
+            this.aliases = aliases;
+        }
+
+        public void aliase(String key, String value) {
+            this.aliases.put(key, value);
         }
 
         public String name() {
@@ -236,11 +252,30 @@ public class GremlinAPI extends API {
         }
 
         public String toJson() {
-            return JsonUtil.toJson(this);
+            Map<String, Object> temp = new HashMap<>();
+            temp.put("gremlin", this.gremlin);
+            temp.put("bindings", this.bindings);
+            temp.put("language", this.language);
+            temp.put("aliases", this.aliases);
+            return JsonUtil.toJson(temp);
         }
 
         public static GremlinRequest fromJson(String json) {
-            return JsonUtil.fromJson(json, GremlinRequest.class);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> temp = JsonUtil.fromJson(json, Map.class);
+            String gremlin = (String) temp.get("gremlin");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> bindings = (Map<String, Object>) temp.get("bindings");
+            String language = (String) temp.get("language");
+            @SuppressWarnings("unchecked")
+            Map<String, String> aliases = (Map<String, String>) temp.get("aliases");
+
+            GremlinRequest request = new GremlinRequest();
+            request.gremlin(gremlin);
+            request.bindings(bindings);
+            request.language(language);
+            request.aliases(aliases);
+            return request;
         }
     }
 }
