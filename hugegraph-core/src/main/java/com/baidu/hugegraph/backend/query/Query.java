@@ -39,7 +39,8 @@ public class Query implements Cloneable {
     public static final long NO_LIMIT = Long.MAX_VALUE;
 
     public static final long NO_CAPACITY = -1L;
-    public static final long DEFAULT_CAPACITY = 800000L; // HugeGraph-777
+    // TODO: Replace 80w with a smaller value?
+    public static final long DEFAULT_CAPACITY = 10000L; // HugeGraph-777
 
     private HugeType resultType;
     private Map<HugeKeys, Order> orders;
@@ -178,6 +179,10 @@ public class Query implements Cloneable {
         this.page = page;
     }
 
+    public void resetPage() {
+        this.page = "";
+    }
+
     public boolean paging() {
         return this.page != null;
     }
@@ -265,8 +270,9 @@ public class Query implements Cloneable {
 
     @Override
     public String toString() {
-        return String.format("Query for %s offset=%d, limit=%d, order by %s",
+        return String.format("Query for %s page=%s, offset=%d, limit=%d, order by %s",
                              this.resultType,
+                             this.page,
                              this.offset,
                              this.limit,
                              this.orders.toString());
